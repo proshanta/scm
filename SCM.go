@@ -63,14 +63,14 @@ func (t *POC) Init(stub shim.ChaincodeStubInterface, function string, args []str
 
 	// Create application Table
 	err = stub.CreateTable("User", []*shim.ColumnDefinition{
-		&shim.ColumnDefinition{Name: "firstName", Type: shim.ColumnDefinition_STRING, Key: true},
+		&shim.ColumnDefinition{Name: "firstName", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "lastName", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "email", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "country", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "address", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "phoneNo", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "role", Type: shim.ColumnDefinition_STRING, Key: false},
-		&shim.ColumnDefinition{Name: "userId", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "userId", Type: shim.ColumnDefinition_STRING, Key: true},
 		&shim.ColumnDefinition{Name: "password", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "nodeId", Type: shim.ColumnDefinition_STRING, Key: false},
 	})
@@ -87,10 +87,10 @@ func (t *POC) Init(stub shim.ChaincodeStubInterface, function string, args []str
 
 	// Create application Table
 	err = stub.CreateTable("BookingDetails", []*shim.ColumnDefinition{
-		&shim.ColumnDefinition{Name: "userId", Type: shim.ColumnDefinition_STRING, Key: true},
+		&shim.ColumnDefinition{Name: "userId", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "sourcePort", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "destinationPort", Type: shim.ColumnDefinition_STRING, Key: false},
-		&shim.ColumnDefinition{Name: "bookingNo", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "bookingNo", Type: shim.ColumnDefinition_STRING, Key: true},
 		&shim.ColumnDefinition{Name: "consingnee", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "cargoType", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "cargoDsec", Type: shim.ColumnDefinition_STRING, Key: false},
@@ -523,6 +523,12 @@ func (t *POC) Invoke(stub shim.ChaincodeStubInterface, function string, args []s
 	} else if function == "createBooking" { 
 		t := POC{}
 		return t.createBooking(stub, args)
+	} else if function == "exportHaulage" { 
+		t := POC{}
+		return t.exportHaulage(stub, args)
+	} else if function == "updateCargoStatus" { 
+		t := POC{}
+		return t.updateCargoStatus(stub, args)
 	}
 	return nil, errors.New("Invalid invoke function name.")
 
