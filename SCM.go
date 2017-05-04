@@ -368,69 +368,87 @@ func (t *POC) exportHaulage(stub shim.ChaincodeStubInterface, args []string) ([]
 	for row1 := range cargoIdList {
 		cargoId := cargoIdList[row1]
 		
-		// Get the row pertaining to this cargoId
-		var columns1 []shim.Column
-		col1 := shim.Column{Value: &shim.Column_String_{String_: cargoId}}
-		columns1 = append(columns1, col1)
-
-		row, err := stub.GetRow("BookingDetails", columns1)
-		if err != nil {
-			return nil, fmt.Errorf("Error: Failed retrieving data with cargoId %s. Error %s", cargoId, err.Error())
-		}
-
-		// GetRows returns empty message if key does not exist
-		if len(row.Columns) == 0 {
-			return nil, nil
-		}
 		
-		//End- Check that the currentStatus to newStatus transition is accurate
-		// Delete the row pertaining to this applicationId
-		err = stub.DeleteRow(
-			"BookingDetails",
-			columns1,
-		)
-		if err != nil {
-			return nil, errors.New("Failed deleting row while updating cargo status.")
-		}
-		userId := row.Columns[0].GetString_()
-		sourcePort := row.Columns[1].GetString_()
-		destinationPort := row.Columns[2].GetString_()
-		bookingNo := row.Columns[3].GetString_()
-		consingnee := row.Columns[4].GetString_()
-		cargoType := row.Columns[5].GetString_()
-		cargoDsec := row.Columns[6].GetString_()
-		cargoId = row.Columns[7].GetString_()
-		containerId := newContainerId
-		specialReq := row.Columns[9].GetString_()
-		measurements := row.Columns[10].GetString_()
-		weight := row.Columns[11].GetString_()
-		status := newStatus
-		nodeId := newNodeId
-		
-		// Insert a row
-		ok, err := stub.InsertRow("BookingDetails", shim.Row{
-			Columns: []*shim.Column{
-				&shim.Column{Value: &shim.Column_String_{String_: userId}},
-				&shim.Column{Value: &shim.Column_String_{String_: sourcePort}},
-				&shim.Column{Value: &shim.Column_String_{String_: destinationPort}},
-				&shim.Column{Value: &shim.Column_String_{String_: bookingNo}},
-				&shim.Column{Value: &shim.Column_String_{String_: consingnee}},
-				&shim.Column{Value: &shim.Column_String_{String_: cargoType}},
-				&shim.Column{Value: &shim.Column_String_{String_: cargoDsec}},
-				&shim.Column{Value: &shim.Column_String_{String_: cargoId}},
-				&shim.Column{Value: &shim.Column_String_{String_: containerId}},
-				&shim.Column{Value: &shim.Column_String_{String_: specialReq}},
-				&shim.Column{Value: &shim.Column_String_{String_: measurements}},
-				&shim.Column{Value: &shim.Column_String_{String_: weight}},
-				&shim.Column{Value: &shim.Column_String_{String_: status}},
-				&shim.Column{Value: &shim.Column_String_{String_: nodeId}},				
-			}})
 
+		var columns []shim.Column
+
+		rows, err := stub.GetRows("BookingDetails", columns)
 		if err != nil {
-			return nil, err 
+			return nil, fmt.Errorf("Failed to retrieve row")
 		}
-		if !ok && err == nil {
-			return nil, errors.New("Failed to insert row while updating cargo status.")
+
+		for row := range rows {	
+		
+			tempCargoid := row.Columns[7].GetString_()
+			if tempCargoid==cargoId{
+			
+				bookingNo:=row.Columns[3].GetString_()
+				
+				// Get the row pertaining to this bookingNo
+				var columns1 []shim.Column
+				col1 := shim.Column{Value: &shim.Column_String_{String_: bookingNo}}
+				columns1 = append(columns1, col1)
+
+				row, err := stub.GetRow("BookingDetails", columns1)
+				if err != nil {
+					return nil, fmt.Errorf("Error: Failed retrieving data with bookingNo %s. Error %s", bookingNo, err.Error())
+				}
+
+				// GetRows returns empty message if key does not exist
+				if len(row.Columns) == 0 {
+					return nil, nil
+				}
+			
+				//End- Check that the currentStatus to newStatus transition is accurate
+				// Delete the row pertaining to this applicationId
+				err = stub.DeleteRow(
+					"BookingDetails",
+					columns1,
+				)
+				if err != nil {
+					return nil, errors.New("Failed deleting row while updating cargo status.")
+				}
+				userId := row.Columns[0].GetString_()
+				sourcePort := row.Columns[1].GetString_()
+				destinationPort := row.Columns[2].GetString_()
+				bookingNo = row.Columns[3].GetString_()
+				consingnee := row.Columns[4].GetString_()
+				cargoType := row.Columns[5].GetString_()
+				cargoDsec := row.Columns[6].GetString_()
+				cargoId = row.Columns[7].GetString_()
+				containerId := newContainerId
+				specialReq := row.Columns[9].GetString_()
+				measurements := row.Columns[10].GetString_()
+				weight := row.Columns[11].GetString_()
+				status := newStatus
+				nodeId := newNodeId
+		
+					// Insert a row
+				ok, err := stub.InsertRow("BookingDetails", shim.Row{
+					Columns: []*shim.Column{
+						&shim.Column{Value: &shim.Column_String_{String_: userId}},
+						&shim.Column{Value: &shim.Column_String_{String_: sourcePort}},
+						&shim.Column{Value: &shim.Column_String_{String_: destinationPort}},
+						&shim.Column{Value: &shim.Column_String_{String_: bookingNo}},
+						&shim.Column{Value: &shim.Column_String_{String_: consingnee}},
+						&shim.Column{Value: &shim.Column_String_{String_: cargoType}},
+						&shim.Column{Value: &shim.Column_String_{String_: cargoDsec}},
+						&shim.Column{Value: &shim.Column_String_{String_: cargoId}},
+						&shim.Column{Value: &shim.Column_String_{String_: containerId}},
+						&shim.Column{Value: &shim.Column_String_{String_: specialReq}},
+						&shim.Column{Value: &shim.Column_String_{String_: measurements}},
+						&shim.Column{Value: &shim.Column_String_{String_: weight}},
+						&shim.Column{Value: &shim.Column_String_{String_: status}},
+						&shim.Column{Value: &shim.Column_String_{String_: nodeId}},				
+					}})
+
+				if err != nil {
+					return nil, err 
+				}
+				if !ok && err == nil {
+					return nil, errors.New("Failed to insert row while updating cargo status.")
+				}
+			}
 		}
 	}
 	return nil, nil
@@ -446,71 +464,86 @@ func (t *POC) updateCargoStatus(stub shim.ChaincodeStubInterface, args []string)
 	cargoId := args[1]
 	newNodeId := args[2]
 	
-	// Get the row pertaining to this cargoId
-		var columns1 []shim.Column
-		col1 := shim.Column{Value: &shim.Column_String_{String_: cargoId}}
-		columns1 = append(columns1, col1)
+	var columns []shim.Column
 
-		row, err := stub.GetRow("BookingDetails", columns1)
-		if err != nil {
-			return nil, fmt.Errorf("Error: Failed retrieving data with cargoId %s. Error %s", cargoId, err.Error())
-		}
+	rows, err := stub.GetRows("BookingDetails", columns)
+	if err != nil {
+			return nil, fmt.Errorf("Failed to retrieve row")
+	}
 
-		// GetRows returns empty message if key does not exist
-		if len(row.Columns) == 0 {
-			return nil, nil
-		}
+	for row := range rows {	
 		
-		//End- Check that the currentStatus to newStatus transition is accurate
-		// Delete the row pertaining to this applicationId
-		err = stub.DeleteRow(
-			"BookingDetails",
-			columns1,
-		)
-		if err != nil {
-			return nil, errors.New("Failed deleting row while updating cargo status.")
-		}
-		userId := row.Columns[0].GetString_()
-		sourcePort := row.Columns[1].GetString_()
-		destinationPort := row.Columns[2].GetString_()
-		bookingNo := row.Columns[3].GetString_()
-		consingnee := row.Columns[4].GetString_()
-		cargoType := row.Columns[5].GetString_()
-		cargoDsec := row.Columns[6].GetString_()
-		cargoId = row.Columns[7].GetString_()
-		containerId := row.Columns[8].GetString_()
-		specialReq := row.Columns[9].GetString_()
-		measurements := row.Columns[10].GetString_()
-		weight := row.Columns[11].GetString_()
-		status := newStatus
-		nodeId := newNodeId
-		
-		// Insert a row
-		ok, err := stub.InsertRow("BookingDetails", shim.Row{
-			Columns: []*shim.Column{
-				&shim.Column{Value: &shim.Column_String_{String_: userId}},
-				&shim.Column{Value: &shim.Column_String_{String_: sourcePort}},
-				&shim.Column{Value: &shim.Column_String_{String_: destinationPort}},
-				&shim.Column{Value: &shim.Column_String_{String_: bookingNo}},
-				&shim.Column{Value: &shim.Column_String_{String_: consingnee}},
-				&shim.Column{Value: &shim.Column_String_{String_: cargoType}},
-				&shim.Column{Value: &shim.Column_String_{String_: cargoDsec}},
-				&shim.Column{Value: &shim.Column_String_{String_: cargoId}},
-				&shim.Column{Value: &shim.Column_String_{String_: containerId}},
-				&shim.Column{Value: &shim.Column_String_{String_: specialReq}},
-				&shim.Column{Value: &shim.Column_String_{String_: measurements}},
-				&shim.Column{Value: &shim.Column_String_{String_: weight}},
-				&shim.Column{Value: &shim.Column_String_{String_: status}},
-				&shim.Column{Value: &shim.Column_String_{String_: nodeId}},				
-			}})
-
-		if err != nil {
-			return nil, err 
-		}
-		if !ok && err == nil {
-			return nil, errors.New("Failed to insert row while updating caro status.")
-		}
+		tempCargoid := row.Columns[7].GetString_()
+		if tempCargoid==cargoId{
 			
+			bookingNo:=row.Columns[3].GetString_()
+	
+			// Get the row pertaining to this bookingNo
+			var columns1 []shim.Column
+			col1 := shim.Column{Value: &shim.Column_String_{String_: bookingNo}}
+			columns1 = append(columns1, col1)
+
+			row, err := stub.GetRow("BookingDetails", columns1)
+			if err != nil {
+				return nil, fmt.Errorf("Error: Failed retrieving data with bookingNo %s. Error %s", bookingNo, err.Error())
+			}
+
+			// GetRows returns empty message if key does not exist
+			if len(row.Columns) == 0 {
+				return nil, nil
+			}
+			
+			//End- Check that the currentStatus to newStatus transition is accurate
+			// Delete the row pertaining to this applicationId
+			err = stub.DeleteRow(
+				"BookingDetails",
+				columns1,
+			)
+			if err != nil {
+				return nil, errors.New("Failed deleting row while updating cargo status.")
+			}
+			userId := row.Columns[0].GetString_()
+			sourcePort := row.Columns[1].GetString_()
+			destinationPort := row.Columns[2].GetString_()
+			bookingNo = row.Columns[3].GetString_()
+			consingnee := row.Columns[4].GetString_()
+			cargoType := row.Columns[5].GetString_()
+			cargoDsec := row.Columns[6].GetString_()
+			cargoId = row.Columns[7].GetString_()
+			containerId := row.Columns[8].GetString_()
+			specialReq := row.Columns[9].GetString_()
+			measurements := row.Columns[10].GetString_()
+			weight := row.Columns[11].GetString_()
+			status := newStatus
+			nodeId := newNodeId
+			
+			// Insert a row
+			ok, err := stub.InsertRow("BookingDetails", shim.Row{
+				Columns: []*shim.Column{
+					&shim.Column{Value: &shim.Column_String_{String_: userId}},
+					&shim.Column{Value: &shim.Column_String_{String_: sourcePort}},
+					&shim.Column{Value: &shim.Column_String_{String_: destinationPort}},
+					&shim.Column{Value: &shim.Column_String_{String_: bookingNo}},
+					&shim.Column{Value: &shim.Column_String_{String_: consingnee}},
+					&shim.Column{Value: &shim.Column_String_{String_: cargoType}},
+					&shim.Column{Value: &shim.Column_String_{String_: cargoDsec}},
+					&shim.Column{Value: &shim.Column_String_{String_: cargoId}},
+					&shim.Column{Value: &shim.Column_String_{String_: containerId}},
+					&shim.Column{Value: &shim.Column_String_{String_: specialReq}},
+					&shim.Column{Value: &shim.Column_String_{String_: measurements}},
+					&shim.Column{Value: &shim.Column_String_{String_: weight}},
+					&shim.Column{Value: &shim.Column_String_{String_: status}},
+					&shim.Column{Value: &shim.Column_String_{String_: nodeId}},				
+				}})
+
+			if err != nil {
+				return nil, err 
+			}
+			if !ok && err == nil {
+				return nil, errors.New("Failed to insert row while updating caro status.")
+			}
+		}
+	}
 		return nil, nil
 
 }
